@@ -15,7 +15,10 @@ from pwnagotchi.ui.view import BLACK
 import pwnagotchi.ui.fonts as fonts
 import pwnagotchi.plugins as plugins
 import pwnagotchi
+import RPi.GPIO as GPIO #talking to the GPIO pins
 
+GPIO.setmode(GPIO.BCM) #setup for GPIO vs Pin numbers
+GPIO.setup(4, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #GPIO4/pin 7 input 
 
 # TODO: add enable switch in config.yml an cleanup all to the best place
 class UPS:
@@ -66,7 +69,10 @@ class UPSLite(plugins.Plugin):
 
     def on_ui_update(self, ui):
         capacity = self.ups.capacity()
-        ui.set('ups', "%2i%%" % capacity)
+        if (GPIO.input(4) == GPIO.HIGH): #high indicates charging (voltage applied to pin7 on header)
+            ui.set('ups', "%2i@" % capacity) # @ indicates charging 
+        else:
+            ui.set('ups', "%2i%%" % capacity) # % indicates normal usage updated when screen refreshes
         if capacity <= self.options['shutdown']:
             logging.info('[ups_lite] Empty battery (<= %s%%): shuting down' % self.options['shutdown'])
             ui.update(force=True, new_data={'status': 'Battery exhausted, bye ...'})

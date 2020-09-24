@@ -15,7 +15,10 @@ from pwnagotchi.ui.view import BLACK
 import pwnagotchi.ui.fonts as fonts
 import pwnagotchi.plugins as plugins
 import pwnagotchi
+import RPi.GPIO as GPIO
 
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(4, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 # TODO: add enable switch in config.yml an cleanup all to the best place
 class UPS:
